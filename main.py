@@ -6,6 +6,8 @@ import numpy as np
 import requests
 import string
 import time
+from tqdm import tqdm
+from colorama import Fore
 
 csfr, cookies = get_credentials()
 
@@ -37,7 +39,7 @@ headers_users = {
 
 COUNT_LENGTH = 100
 GROUP_ID = 35222
-SAMPLE_FRACTION = 0.0001
+SAMPLE_FRACTION = 0.001
 BLOCK_AUTOMATION = False
 SPREADSHEET_NAME = "TEST_USERS"
 WORKSHEET_NAME = "Sheet2"
@@ -60,7 +62,7 @@ unique_array = np.array([])
 def scrape(g_id):
     global unique_array
 
-    for i in string.ascii_lowercase:
+    for i in tqdm(string.ascii_lowercase, desc="Looking for users....", colour = 'MAGENTA'):
 
         responseNo = 0
 
@@ -94,8 +96,6 @@ def scrape(g_id):
             update_worksheet(unique_array.size, ddf, SPREADSHEET_NAME, WORKSHEET_NAME)
             unique_array = np.array([])
 
-        print(f"Total users for letter {(i)}: {int(responseNo)}")
-
 
 ans = int(input("Group No: "))
 # ans = 35222
@@ -106,7 +106,11 @@ def main():
     if not BLOCK_AUTOMATION:
         ddf = populate_dataframe(unique_array)
         update_worksheet(ddf, SPREADSHEET_NAME, WORKSHEET_NAME)
-    find_locations(SPREADSHEET_NAME, WORKSHEET_NAME, 50)
+
+    LOCS = input("Do you also need user locations? (y/n): ")
+    if LOCS == 'y':
+        LOCS_NUM = int(input("How many locations do you need? (<1000 recommended): "))
+        find_locations(SPREADSHEET_NAME, WORKSHEET_NAME, LOCS_NUM)
 
 
 main()

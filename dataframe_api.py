@@ -22,13 +22,11 @@ def update_worksheet(df, name, wsname):
 
 
 def populate_dataframe(user_list):
-    print("Populating dataframe...")
     leads = np.array([])
     for i in user_list:
         leads = np.append(leads, dict(
             zip(['firstname', 'lastname', 'occupation', 'id'], [i.firstname, i.lastName, i.occupation, i.id])))
     df = pd.DataFrame.from_dict(list(leads), orient='columns')
-    print(df)
     try:
         df['user_url'] = df['id'].apply(lambda x: f"https://www.linkedin.com/in/{x}")
     except:

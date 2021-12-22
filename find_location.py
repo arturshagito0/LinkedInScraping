@@ -49,7 +49,6 @@ def find_locations(table_name, sheet_name, n ):
     df['location'] = df['id'][:n].apply(lambda x: get_user_location(x))
     df = df.fillna("mt")
     worksheet.update([df.columns.values.tolist()] + df.values.tolist())
-    print(df)
 
 
 
