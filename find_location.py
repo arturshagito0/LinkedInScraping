@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import requests
 from login import get_credentials
+from tqdm import tqdm
 
 csfr, cookies = get_credentials()
 
@@ -29,26 +30,46 @@ headers_location = headers = {
     'sec-gpc': '1',
 }
 
+regex_loc = "london|\s+uk\s+|united kingdom|great britain|england"
+
 def get_user_location(p_url):
-    response_location = requests.get(f'https://www.linkedin.com/voyager/api/identity/dash/profiles?q=memberIdentity&memberIdentity={p_url}&decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfileWithEntities-93', headers=headers_location)
+    try:
+        response_location = requests.get(f'https://www.linkedin.com/voyager/api/identity/dash/profiles?q=memberIdentity&memberIdentity={p_url}&decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfileWithEntities-93', headers=headers_location, timeout=60)
+    except Exception as e:
+        print(e)
+        return ""
     for i in json.loads(response_location.text)['included']:
         for k in i.keys():
             if k == "defaultLocalizedName":
                 return i[k]
     return ""
 
+def filter_location(df):
+    df.dropna(inplace=True)
+    df = df[df['location'].str.contains(regex_loc)]
+    return df
 
-def find_locations(table_name, sheet_name, n ):
+def find_locations(table_name, sheet_name, n, filter = True):
     gc = gspread.service_account(filename='creds.json')
     sh = gc.open(table_name)
     worksheet = sh.worksheet(sheet_name)
     data = worksheet.get_all_values()
     headers = data.pop(0)
-    df = pd.DataFrame(data, columns=headers)
 
-    df['location'] = df['id'][:n].apply(lambda x: get_user_location(x))
+    
+    df = pd.DataFrame(data, columns=headers)
+    input(df)
+    
+    tqdm.pandas()
+    df['location'] = df['id'][:n].progress_apply(lambda x: str(get_user_location(x)).lower())
     df = df.fillna("mt")
-    worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+    if filter: df = filter_location(df); print(f"Location Filtered: {len(df)}")
+    if(len(df)>0):
+        input("Next...")
+        worksheet.clear()
+        worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+    else:
+        print("There is no leads in this group :(")
 
 
 

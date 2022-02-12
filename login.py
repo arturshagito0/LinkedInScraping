@@ -7,8 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 op = webdriver.ChromeOptions()
 op.add_argument('headless')
-# driver = webdriver.Chrome("chromedriver.exe", options=op)
-driver = webdriver.Chrome("chromedriver.exe")
+driver = webdriver.Chrome("chromedriver", options=op)
+# driver = webdriver.Chrome("chromedriver")
 
 
 def sign_in(user, passw):
@@ -42,7 +42,7 @@ def manual_sign_in():
     time.sleep(2)
     sign_in_link = driver.find_element_by_xpath('/html/body/nav/div/a[2]')
     sign_in_link.click()
-    time.sleep(2)
+    input()
 
 
 def login():
@@ -51,12 +51,14 @@ def login():
     cs = open("pwd.txt").readlines()
     email = cs[0].strip()
     pwd = cs[1].strip()
+    print("Signing in...")
+    sign_in(email, pwd)
 
-    # sign_in(email, pwd)
+    # manual_sign_in()
 
-    manual_sign_in()
-
-    time.sleep(15)
+    # time.sleep(15)
+    time.sleep(5)
+    print("Sign in finished!")
     temp_label = ["lang", "bcookie", "bscookie", "li_alerts", "G_ENABLED_IDPS", "li_gc",
                   "li_rm", "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg", "aam_uuid",
                   "_gcl_au", "li_at", "liap", "JSESSIONID", "li_mc", "lidc", "timezone",

@@ -2,10 +2,15 @@ import gspread
 import numpy as np
 import pandas as pd
 
+# def create_new_spreadsheet(name):
+#     gc = gspread.service_account(filename='creds.json')
+#     sh = gc.create(name)
+#     sh.share('art_shagi@mail.ru', perm_type='user', role='writer')
+
 def create_new_spreadsheet(name):
     gc = gspread.service_account(filename='creds.json')
     sh = gc.create(name)
-    sh.share('art_shagi@mail.ru', perm_type='user', role='writer')
+    sh.share('gregorypastrana@mail.ru', perm_type='user', role='writer')
 
 
 def create_and_update_worksheet(df, name, wsname):
